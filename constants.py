@@ -1,0 +1,3 @@
+GRAV = 0.3
+JUMP_FORCE = 3
+PLR_SPD = 2
