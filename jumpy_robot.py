@@ -22,7 +22,7 @@ class Game:
         }
 
         pyxel.init(256, 144, caption="Jump stick robo")
-        pyxel.load('jumpy_robot.pyxres')
+        pyxel.load('assets/jumpy_robot.pyxres')
 
         for item in place_objects(CHECK):
             self.game_objects["check"].append(
