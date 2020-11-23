@@ -1,3 +1,4 @@
+from constants import BACK_WALL, MAP_HEIGHT, MAP_WIDTH
 import pyxel
 import math
 
@@ -21,3 +22,13 @@ def collide_map(x: float, y: float, w: int, h: int):
         i += 1
 
     return collide
+
+
+def place_objects(obj_type: int):
+    coords = []
+    for x in range(MAP_WIDTH):
+        for y in range(MAP_HEIGHT):
+            if pyxel.tilemap(0).get(x, y) == obj_type:
+                coords.append({"x": x, "y": y})
+                pyxel.tilemap(0).set(x, y, BACK_WALL)
+    return coords
