@@ -9,13 +9,11 @@ from constants import CHECK, GRAV
 
 
 class Game:
+    plr = Player()
+    checkpoints = []
+    cam = Camera()
+
     def __init__(self) -> None:
-
-        self.plr = Player()
-        self.checkpoints = []
-
-        self.cam = Camera()
-
         self.game_objects = {
             "plr": [self.plr],
             "check": self.checkpoints

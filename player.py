@@ -11,20 +11,15 @@ DOUBLE_JUMPING = 4
 
 
 class Player:
-    def __init__(self) -> None:
-        self.x = 10
-        self.y = 20
-        self.dx = 0
-        self.dy = 0
-
-        self.dir = 1
-
-        self.frame = IDLE
-
-        self.on_ground = False
-
-        self.double_jump = False
-        self.jump_pressed = False
+    x = 10
+    y = 20
+    dx = 0
+    dy = 0
+    dir = 1
+    frame = IDLE
+    on_ground = False
+    double_jump = False
+    jump_pressed = False
 
     def draw(self, cam):
         if self.on_ground:
