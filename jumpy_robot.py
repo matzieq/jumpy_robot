@@ -9,6 +9,7 @@ from constants import CHECK, GRAV
 
 
 class Game:
+
     plr = Player()
     checkpoints = []
     cam = Camera()
@@ -26,14 +27,16 @@ class Game:
             self.game_objects["check"].append(
                 Checkpoint(item['x'] * 8, item['y'] * 8))
 
+        first_check = self.game_objects["check"][0]
+        first_check.state = "active"
+        self.plr.current_checkpoint = (first_check.x, first_check.y)
+
+        print(self.plr.current_checkpoint)
         pyxel.run(self.update, self.draw)
 
     def draw(self):
         pyxel.cls(0)
         pyxel.bltm(0 - self.cam.x, 0 - self.cam.y, 0, 0, 0, 240, 32, 0)
-        # for checkpoint in checkpoints:
-        #     checkpoint.draw(cam)
-        # plr.draw(cam)
 
         for obj_list in self.game_objects.values():
             for obj in obj_list:
@@ -42,9 +45,6 @@ class Game:
     def update(self):
         # plr.update()
         self.cam.update(self.plr.x, self.plr.y)
-
-        # for checkpoint in checkpoints:
-        #     checkpoint.update()
 
         for obj_list in self.game_objects.values():
             for obj in obj_list:

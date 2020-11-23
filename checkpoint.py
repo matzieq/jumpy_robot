@@ -10,7 +10,7 @@ class Checkpoint:
     def __init__(self, x: int, y: int) -> None:
         self.x = x
         self.y = y
-        self.state = "restoring"
+        self.state = "inactive"
         self.is_active = False
 
         self.anims = {
@@ -47,3 +47,24 @@ class Checkpoint:
             "frame_timer": 0,
             "frame_duration": math.floor(60 / FPS)
         }
+
+    def activate(self):
+        self.switch_state("active")
+
+    def deactivate(self):
+        self.switch_state("inactive")
+
+    def restore(self):
+        self.switch_state("restoring")
+
+    def switch_state(self, new_state):
+        self.current_anim = {
+            "frame": 0,
+            "frame_timer": 0,
+            "frame_duration": math.floor(60 / FPS)
+        }
+
+        self.state = new_state
+
+        if new_state == 'active':
+            self.is_active = True

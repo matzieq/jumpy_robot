@@ -3,25 +3,37 @@ import pyxel
 import math
 
 solid_tiles = [32, 96]
+harmful_tiles = [96]
 
 
 def collide_map(x: float, y: float, w: int, h: int):
     collide = False
+    harm = False
     x = math.floor(x)
     y = math.floor(y)
     i = x
     while i < x+w:
-        if pyxel.tilemap(0).get(i/8, y/8) in solid_tiles or pyxel.tilemap(0).get(i/8, (y+h)/8) in solid_tiles:
-            collide = True
+        current_tiles = [pyxel.tilemap(0).get(
+            i/8, y/8), pyxel.tilemap(0).get(i/8, (y+h)/8)]
+        for tile in current_tiles:
+            if tile in solid_tiles:
+                collide = True
+            if tile in harmful_tiles:
+                harm = True
         i += 1
 
     i = y
     while i < y + h:
-        if pyxel.tilemap(0).get(x/8, i/8) in solid_tiles or pyxel.tilemap(0).get((x+w)/8, i/8) in solid_tiles:
-            collide = True
+        current_tiles = [pyxel.tilemap(0).get(
+            x/8, i/8), pyxel.tilemap(0).get((x+w)/8, i/8)]
+        for tile in current_tiles:
+            if tile in solid_tiles:
+                collide = True
+            if tile in harmful_tiles:
+                harm = True
         i += 1
 
-    return collide
+    return collide, harm
 
 
 def place_objects(obj_type: int):

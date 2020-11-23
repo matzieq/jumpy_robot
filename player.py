@@ -1,3 +1,4 @@
+from camera import Camera
 import math
 import pyxel
 import utils
@@ -20,8 +21,13 @@ class Player:
     on_ground = False
     double_jump = False
     jump_pressed = False
+    current_checkpoint = (0, 0)
 
-    def draw(self, cam):
+    def __init__(self) -> None:
+        self.update = self.update_normal
+        self.draw = self.draw_normal
+
+    def draw_normal(self, cam: Camera):
         if self.on_ground:
             self.frame = IDLE
         elif self.double_jump:
@@ -32,11 +38,17 @@ class Player:
         pyxel.blt(self.x - cam.x, self.y - cam.y,
                   0, self.frame * 8, 0, self.dir * 8, 8, 0)
 
-    def update(self):
+    def draw_dead(self, cam: Camera):
+        pass
+
+    def update_normal(self):
         self.apply_gravity()
         self.check_input()
         self.handle_collisions()
         self.move()
+
+    def update_dead(self):
+        self.x, self.y = self.current_checkpoint
 
     def apply_gravity(self):
         self.dy += GRAV
@@ -55,7 +67,12 @@ class Player:
     def handle_collisions(self):
         self.on_ground = False
 
-        if collide_map(self.x, self.y + self.dy, 8, 8):
+        collide, harm = collide_map(self.x, self.y + self.dy, 8, 8)
+
+        if harm:
+            self.kill()
+
+        if collide:
             if (self.dy > 0):
                 self.on_ground = True
                 self.y = math.floor((self.y + self.dy) / 8) * 8 - 0.1
@@ -63,7 +80,9 @@ class Player:
                 self.dx = 0
             self.dy = 0
 
-        if collide_map(self.x + self.dx, self.y, 8, 8) and not self.on_ground:
+        collide, harm = collide_map(self.x + self.dx, self.y, 8, 8)
+
+        if collide and not self.on_ground:
             self.dx = 0
             self.double_jump = False
 
@@ -82,3 +101,11 @@ class Player:
             self.dir = -self.dir
             self.dx = self.dir * PLR_SPD
             pyxel.play(0, 0)
+
+    def kill(self):
+        self.draw = self.draw_dead
+        self.update = self.update_dead
+
+    def restore(self):
+        self.draw = self.draw_normal
+        self.update = self.update_normal
