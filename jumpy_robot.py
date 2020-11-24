@@ -1,11 +1,10 @@
-from utils import collide_map, place_objects
+from utils import place_objects
 from checkpoint import Checkpoint
 from camera import Camera
-import math
 import pyxel
 
 from player import Player
-from constants import CHECK, GRAV
+from constants import CHECK, GRAV, MAP_HEIGHT, MAP_WIDTH
 
 
 class Game:
@@ -30,13 +29,15 @@ class Game:
         first_check = self.game_objects["check"][0]
         first_check.switch_state("active")
         self.plr.current_checkpoint = first_check
+        self.plr.kill()
+        self.plr.current_checkpoint.restore()
 
-        print(self.plr.current_checkpoint)
         pyxel.run(self.update, self.draw)
 
     def draw(self):
         pyxel.cls(0)
-        pyxel.bltm(0 - self.cam.x, 0 - self.cam.y, 0, 0, 0, 240, 32, 0)
+        pyxel.bltm(0 - self.cam.x, 0 - self.cam.y,
+                   0, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0)
 
         pyxel.text(10, 10, str(self.plr.can_wall_jump), 7)
 

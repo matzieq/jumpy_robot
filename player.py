@@ -10,17 +10,18 @@ from constants import GRAV, JUMP_FORCE, PLR_SPD
 
 IDLE = 1
 JUMPING = 2
-FALLING = 3
+WALL_JUMPING = 3
 DOUBLE_JUMPING = 4
+NEXT_ROW_OFFSET = 8
 
 
 class Player:
-    x = 10
+    x = 16
     y = 20
     dx = 0
     dy = 0
     dir = 1
-    frame = IDLE
+    frame = JUMPING
     on_ground = False
     double_jump = False
     jump_pressed = False
@@ -34,13 +35,15 @@ class Player:
     def draw_normal(self, cam: Camera):
         if self.on_ground:
             self.frame = IDLE
+        elif self.can_wall_jump and not self.jump_pressed:
+            self.frame = WALL_JUMPING
         elif self.double_jump:
             self.frame = DOUBLE_JUMPING
         else:
             self.frame = JUMPING
 
-        pyxel.blt(self.x - cam.x, self.y - cam.y,
-                  0, self.frame * 8, 0, self.dir * 8, 8, 0)
+        pyxel.blt(self.x - cam.x, self.y - cam.y + 1,
+                  0, self.frame * 8, int(self.double_jump) * NEXT_ROW_OFFSET, self.dir * 8, 8, 0)
 
     def draw_dead(self, cam: Camera):
         pass
@@ -72,7 +75,7 @@ class Player:
         self.on_ground = False
 
         # handle vertical collisions
-        collide, harm = collide_map(self.x, self.y + self.dy, 8, 8)
+        collide, harm = collide_map(self.x, self.y + self.dy, 7, 8)
 
         if harm:
             self.kill()
@@ -87,14 +90,30 @@ class Player:
             self.dy = 0
 
         # handle horizontal collisions
-        collide, harm = collide_map(self.x + self.dx, self.y, 8, 8)
+        collide, harm = collide_map(self.x + self.dx, self.y, 7, 8)
 
-        if collide and not self.on_ground:
+        if harm:
+            self.kill()
+            self.current_checkpoint.restore()
+
+        if collide:
+            print("***")
+            print(self.x)
+            if self.dx > 0:
+                self.x = math.floor((self.x + self.dx) / 8) * 8 + 0.1
+            elif self.dx < 0:
+                self.x = math.ceil((self.x + self.dx) / 8) * 8
+
+            print(self.x)
             self.dx = 0
 
         # handle wall jump
-        is_wall_left, _ = collide_map(self.x - 1, self.y, 8, 8)
-        is_wall_right, _ = collide_map(self.x + 1, self.y, 8, 8)
+        is_wall_left, _ = collide_map(self.x - 3, self.y, 8, 8)
+        is_wall_right, _ = collide_map(self.x + 3, self.y, 8, 8)
+        if is_wall_left:
+            print("IS WALL LEFT")
+        if is_wall_right:
+            print("IS WALL RIGHT")
 
         self.can_wall_jump = is_wall_left or is_wall_right
 
@@ -107,9 +126,14 @@ class Player:
             self.dy = -JUMP_FORCE
             self.dx = self.dir * PLR_SPD
             pyxel.play(0, 0)
-        elif not self.double_jump or self.can_wall_jump:
+        elif not self.double_jump and not self.can_wall_jump:
             self.dy = -JUMP_FORCE
             self.double_jump = True
+            self.dir = -self.dir
+            self.dx = self.dir * PLR_SPD
+            pyxel.play(0, 0)
+        if not self.on_ground and self.can_wall_jump:
+            self.dy = -JUMP_FORCE
             self.dir = -self.dir
             self.dx = self.dir * PLR_SPD
             pyxel.play(0, 0)

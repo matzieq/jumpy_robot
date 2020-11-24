@@ -1,5 +1,7 @@
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from player import Player
 import math
-from player import Player
 import pyxel
 
 INITIAL_ADDRESS = 0
@@ -41,8 +43,6 @@ class Checkpoint:
                 self.current_anim["frame"] = 0
 
         self.current_anim['frame_timer'] -= 1
-
-        print(self.is_active)
 
         if self.is_active and self.current_anim["frame"] == 9:
             print("frame 7")

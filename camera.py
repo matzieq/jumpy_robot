@@ -8,4 +8,4 @@ class Camera:
 
     def update(self, target_x, target_y):
         self.x = math.floor(target_x / 256) * 256
-        self.y = math.floor(target_y / 144) * 144
+        self.y = math.floor(target_y / 128) * 128
