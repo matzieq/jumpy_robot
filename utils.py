@@ -3,7 +3,7 @@ import pyxel
 import math
 
 solid_tiles = [32, 96]
-harmful_tiles = [96]
+harmful_tiles = [96, 97, 98, 99]
 
 
 def collide_map(x: float, y: float, w: int, h: int):
@@ -34,6 +34,10 @@ def collide_map(x: float, y: float, w: int, h: int):
         i += 1
 
     return collide, harm
+
+
+def collide_object(self, other):
+    return self.x < other.x + 8 and self.x + 8 > other.x and self.y < other.y + 8 and self.y + 8 > other.y
 
 
 def place_objects(obj_type: int):

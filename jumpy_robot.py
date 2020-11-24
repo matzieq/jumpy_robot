@@ -1,4 +1,4 @@
-from utils import place_objects
+from utils import collide_object, place_objects
 from checkpoint import Checkpoint
 from camera import Camera
 import pyxel
@@ -39,7 +39,7 @@ class Game:
         pyxel.bltm(0 - self.cam.x, 0 - self.cam.y,
                    0, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0)
 
-        pyxel.text(10, 10, str(self.plr.can_wall_jump), 7)
+        # pyxel.text(10, 10, str(self.plr.can_wall_jump), 7)
 
         for obj_list in self.game_objects.values():
             for obj in obj_list:
@@ -52,6 +52,16 @@ class Game:
         for obj_list in self.game_objects.values():
             for obj in obj_list:
                 obj.update()
+
+        for checkpoint in self.game_objects['check']:
+            if collide_object(self.plr, checkpoint) and not checkpoint.is_active:
+                print("Inactive")
+                for checkpoint in self.game_objects['check']:
+                    print(checkpoint)
+                    print("DEACTIVATE")
+                    checkpoint.deactivate()
+                checkpoint.activate()
+                self.plr.current_checkpoint = checkpoint
 
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()

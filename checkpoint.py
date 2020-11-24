@@ -45,12 +45,12 @@ class Checkpoint:
         self.current_anim['frame_timer'] -= 1
 
         if self.is_active and self.current_anim["frame"] == 9:
-            print("frame 7")
             self.plr_ref.restore()
 
     def draw(self, cam):
+        current_frame = self.anims[self.state][self.current_anim["frame"]] * 8
         pyxel.blt(self.x - cam.x, self.y - cam.y,
-                  0, self.current_anim["frame"] * 8, ROW, 8, 8, 0)
+                  0, current_frame, ROW, 8, 8, 0)
 
     def switch_anim(self, new_anim: str):
         self.state = new_anim
@@ -61,10 +61,12 @@ class Checkpoint:
         }
 
     def activate(self):
+        print("ACTIVATE FROM CHECKPOINT")
         self.switch_state("active")
         self.is_active = True
 
     def deactivate(self):
+        print("DEACTIVATE FROM CHECKPOINT")
         self.switch_state("inactive")
 
     def restore(self):
