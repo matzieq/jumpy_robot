@@ -1,3 +1,6 @@
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from checkpoint import Checkpoint
 from camera import Camera
 import math
 import pyxel
@@ -21,7 +24,8 @@ class Player:
     on_ground = False
     double_jump = False
     jump_pressed = False
-    current_checkpoint = (0, 0)
+    can_wall_jump = False
+    current_checkpoint = None
 
     def __init__(self) -> None:
         self.update = self.update_normal
@@ -48,7 +52,7 @@ class Player:
         self.move()
 
     def update_dead(self):
-        self.x, self.y = self.current_checkpoint
+        pass
 
     def apply_gravity(self):
         self.dy += GRAV
@@ -67,10 +71,12 @@ class Player:
     def handle_collisions(self):
         self.on_ground = False
 
+        # handle vertical collisions
         collide, harm = collide_map(self.x, self.y + self.dy, 8, 8)
 
         if harm:
             self.kill()
+            self.current_checkpoint.restore()
 
         if collide:
             if (self.dy > 0):
@@ -80,11 +86,17 @@ class Player:
                 self.dx = 0
             self.dy = 0
 
+        # handle horizontal collisions
         collide, harm = collide_map(self.x + self.dx, self.y, 8, 8)
 
         if collide and not self.on_ground:
             self.dx = 0
-            self.double_jump = False
+
+        # handle wall jump
+        is_wall_left, _ = collide_map(self.x - 1, self.y, 8, 8)
+        is_wall_right, _ = collide_map(self.x + 1, self.y, 8, 8)
+
+        self.can_wall_jump = is_wall_left or is_wall_right
 
     def move(self):
         self.x += self.dx
@@ -95,7 +107,7 @@ class Player:
             self.dy = -JUMP_FORCE
             self.dx = self.dir * PLR_SPD
             pyxel.play(0, 0)
-        elif not self.double_jump:
+        elif not self.double_jump or self.can_wall_jump:
             self.dy = -JUMP_FORCE
             self.double_jump = True
             self.dir = -self.dir
@@ -105,7 +117,14 @@ class Player:
     def kill(self):
         self.draw = self.draw_dead
         self.update = self.update_dead
+        self.x, self.y = self.current_checkpoint.x - 1, self.current_checkpoint.y
+        self.dir = 1
+        self.dx = 0
+        self.dy = 0
 
     def restore(self):
         self.draw = self.draw_normal
         self.update = self.update_normal
+
+    def set_checkpoint(self, new_check: 'Checkpoint'):
+        self.current_checkpoint = new_check

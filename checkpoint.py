@@ -1,4 +1,5 @@
 import math
+from player import Player
 import pyxel
 
 INITIAL_ADDRESS = 0
@@ -7,7 +8,7 @@ FPS = 20
 
 
 class Checkpoint:
-    def __init__(self, x: int, y: int) -> None:
+    def __init__(self, x: int, y: int, plr_ref: 'Player') -> None:
         self.x = x
         self.y = y
         self.state = "inactive"
@@ -25,6 +26,8 @@ class Checkpoint:
             "frame_duration": math.floor(60 / FPS)
         }
 
+        self.plr_ref = plr_ref
+
     def update(self):
         if self.current_anim['frame_timer'] <= 0:
             self.current_anim['frame_timer'] = self.current_anim['frame_duration']
@@ -32,9 +35,18 @@ class Checkpoint:
             if self.current_anim["frame"] < len(self.anims[self.state]) - 1:
                 self.current_anim["frame"] += 1
             else:
+                if self.state == "restoring":
+                    self.switch_state(
+                        "active" if self.is_active else "inactive")
                 self.current_anim["frame"] = 0
 
         self.current_anim['frame_timer'] -= 1
+
+        print(self.is_active)
+
+        if self.is_active and self.current_anim["frame"] == 9:
+            print("frame 7")
+            self.plr_ref.restore()
 
     def draw(self, cam):
         pyxel.blt(self.x - cam.x, self.y - cam.y,
@@ -50,6 +62,7 @@ class Checkpoint:
 
     def activate(self):
         self.switch_state("active")
+        self.is_active = True
 
     def deactivate(self):
         self.switch_state("inactive")
