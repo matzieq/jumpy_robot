@@ -22,6 +22,8 @@ class Camera:
             self.shake_duration -= 1
         else:
             self.shake_magnitude = 0
+            self.shake_x = 0
+            self.shake_y = 0
 
     def shake(self, duration: int, magnitude: int):
         self.shake_duration = duration
