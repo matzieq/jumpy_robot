@@ -5,13 +5,14 @@ from camera import Camera
 import pyxel
 
 from player import Player
-from constants import CHECK, GRAV, MAP_HEIGHT, MAP_WIDTH, SWITCH
+from constants import CHECK, GRAV, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH
 
 
 class Game:
 
     plr = Player()
     cam = Camera()
+    flash_white = False
 
     def __init__(self) -> None:
         self.game_objects = {
@@ -20,7 +21,7 @@ class Game:
             "plr": [self.plr]
         }
 
-        pyxel.init(256, 144, caption="Jump stick robo")
+        pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Jump stick robo")
         pyxel.load('assets/jumpy_robot.pyxres')
 
         for x, y in place_objects(CHECK):
@@ -48,6 +49,10 @@ class Game:
             for obj in obj_list:
                 obj.draw(self.cam)
 
+        if self.flash_white:
+            pyxel.rect(0, 0, SCREEN_WIDTH, SCREEN_WIDTH, 15)
+            self.flash_white = False
+
     def update(self):
         self.cam.update(self.plr.x, self.plr.y)
 
@@ -63,8 +68,10 @@ class Game:
                 self.plr.current_checkpoint = checkpoint
 
         for game_switch in self.game_objects['switch']:
-            if collide_object(self.plr, game_switch):
+            if collide_object(self.plr, game_switch) and not game_switch.is_on:
                 game_switch.turn_on()
+                self.cam.shake(10, 3)
+                self.flash_white = True
 
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
