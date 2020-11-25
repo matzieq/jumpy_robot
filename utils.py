@@ -1,6 +1,11 @@
-from constants import BACK_WALL, MAP_HEIGHT, MAP_WIDTH
+from constants import BACK_WALL, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH
 import pyxel
 import math
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from camera import Camera
 
 solid_tiles = [32, 96]
 harmful_tiles = [96, 97, 98, 99]
@@ -48,3 +53,7 @@ def place_objects(obj_type: int):
                 coords.append((x, y))
                 pyxel.tilemap(0).set(x, y, BACK_WALL)
     return coords
+
+
+def is_on_screen(x: int, y: int, cam: 'Camera'):
+    return x >= cam.x and x <= cam.x + SCREEN_WIDTH and y >= cam.y and y <= cam.y + SCREEN_HEIGHT

@@ -8,7 +8,9 @@ from camera import Camera
 import pyxel
 
 from player import Player
-from constants import BAD_ROBOT, CHECK, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH
+from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH
+
+DEBUG_MODE = True
 
 
 class Game:
@@ -39,7 +41,11 @@ class Game:
 
         for x, y in place_objects(BAD_ROBOT):
             self.game_objects["robot"].append(
-                BadRobot(x * 8, y * 8))
+                BadRobot(x * 8, y * 8, self.cam))
+
+        for x, y in place_objects(BADDER_ROBOT):
+            self.game_objects["robot"].append(
+                BadRobot(x * 8, y * 8, self.cam, True))
 
         first_check = self.game_objects["check"][0]
         first_check.activate()
@@ -67,6 +73,7 @@ class Game:
         self.update_objects()
         self.handle_checkpoint_collisions()
         self.handle_switch_collisions()
+        self.handle_robot_collisions()
         self.check_quit()
 
     def update_objects(self):
@@ -88,6 +95,16 @@ class Game:
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
 
+        if DEBUG_MODE:
+            if pyxel.btnp(pyxel.KEY_LEFT):
+                self.plr.x -= 100
+            if pyxel.btnp(pyxel.KEY_RIGHT):
+                self.plr.x += 100
+            if pyxel.btnp(pyxel.KEY_UP):
+                self.plr.y -= 100
+            if pyxel.btnp(pyxel.KEY_DOWN):
+                self.plr.y += 100
+
     def handle_switch_collisions(self):
         for game_switch in self.game_objects['switch']:
             if collide_object(self.plr, game_switch) and not game_switch.is_on:
@@ -96,6 +113,11 @@ class Game:
                 self.flash_white = True
                 self.recalculate_score()
                 pyxel.play(0, 8)
+
+    def handle_robot_collisions(self):
+        for bad_robot in self.game_objects['robot']:
+            if collide_object(self.plr, bad_robot):
+                self.plr.kill()
 
     def recalculate_score(self):
         self.score = functools.reduce(

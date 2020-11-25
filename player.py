@@ -29,6 +29,7 @@ class Player:
     double_jump = False
     jump_pressed = False
     can_wall_jump = False
+    alive = True
     current_checkpoint = None
     puff_frame_timer = 0
     death_puff = {
@@ -102,7 +103,7 @@ class Player:
             pyxel.play(0, 5)
             self.current_checkpoint.restore()
             self.x, self.y = self.current_checkpoint.x - 1, self.current_checkpoint.y
-        pass
+            self.alive = True
 
     def apply_gravity(self):
         if self.dy < MAX_FALLING_SPEED:
@@ -185,15 +186,20 @@ class Player:
             pyxel.play(0, 0)
 
     def kill(self, no_anim: bool = False):
+        if not self.alive:
+            return
+        self.alive = False
         self.draw = self.draw_dead
         self.update = self.update_dead
-        self.death_puff["x"] = self.x
-        self.death_puff["y"] = self.y
-        self.puff_frame_timer = 7 if no_anim else 0
         self.dir = 1
         self.dx = 0
         self.dy = 0
-        pyxel.play(0, 4)
+
+        if not no_anim:
+            self.death_puff["x"] = self.x
+            self.death_puff["y"] = self.y
+            self.puff_frame_timer = 0
+            pyxel.play(0, 4)
 
     def restore(self):
         self.draw = self.draw_normal

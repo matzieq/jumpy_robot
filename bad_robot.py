@@ -1,7 +1,7 @@
 import math
 import pyxel
 from typing import TYPE_CHECKING
-from utils import collide_map
+from utils import collide_map, is_on_screen
 
 if TYPE_CHECKING:
     from camera import Camera
@@ -16,12 +16,14 @@ BACK_SPEED = 0.5
 
 class BadRobot:
     anim_frame = NORMAL
-    timer = 60
 
-    def __init__(self, x: int, y: int) -> None:
+    def __init__(self, x: int, y: int, cam_ref: 'Camera', is_badder: bool = False) -> None:
         self.x = x
         self.y = y
         self.update = self.idle
+        self.cam_ref = cam_ref
+        self.max_timer = 30 if is_badder else 60
+        self.timer = self.max_timer
 
     def draw(self, cam: 'Camera'):
         pyxel.blt(self.x - cam.x, self.y - cam.y,
@@ -31,13 +33,13 @@ class BadRobot:
         self.timer -= 1
         if self.timer <= 0:
             self.anim_frame = BAD
-            self.timer = 60
+            self.timer = self.max_timer
             self.update = self.preparing
 
     def preparing(self):
         self.timer -= 1
         if self.timer <= 0:
-            self.timer = 60
+            self.timer = self.max_timer
             self.update = self.attacking
 
     def attacking(self):
@@ -50,6 +52,8 @@ class BadRobot:
                 print(collide_map(self.x, self.y, 8, 8)[0])
                 self.y -= 1
             self.update = self.retracting
+            if is_on_screen(self.x, self.y, self.cam_ref):
+                self.cam_ref.shake(3, 1)
 
     def retracting(self):
         self.y -= BACK_SPEED
