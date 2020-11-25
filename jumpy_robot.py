@@ -1,3 +1,4 @@
+from bad_robot import BadRobot
 import functools
 from hud import Hud
 from switch import Switch
@@ -7,7 +8,7 @@ from camera import Camera
 import pyxel
 
 from player import Player
-from constants import CHECK, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH
+from constants import BAD_ROBOT, CHECK, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH
 
 
 class Game:
@@ -20,6 +21,7 @@ class Game:
         self.game_objects = {
             "check": [],
             "switch": [],
+            "robot": [],
             "plr": [self.plr],
             "hud": [Hud(self)]
         }
@@ -34,6 +36,10 @@ class Game:
         for x, y in place_objects(SWITCH):
             self.game_objects["switch"].append(
                 Switch(x * 8, y * 8))
+
+        for x, y in place_objects(BAD_ROBOT):
+            self.game_objects["robot"].append(
+                BadRobot(x * 8, y * 8))
 
         first_check = self.game_objects["check"][0]
         first_check.activate()

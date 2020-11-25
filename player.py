@@ -165,6 +165,7 @@ class Player:
 
     def jump(self):
         if self.on_ground:
+            print(self.y)
             self.dy = -JUMP_FORCE
             self.dx = self.dir * PLR_SPD
             pyxel.play(0, 0)
