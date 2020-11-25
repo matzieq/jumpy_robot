@@ -45,6 +45,6 @@ def place_objects(obj_type: int):
     for x in range(MAP_WIDTH):
         for y in range(MAP_HEIGHT):
             if pyxel.tilemap(0).get(x, y) == obj_type:
-                coords.append({"x": x, "y": y})
+                coords.append((x, y))
                 pyxel.tilemap(0).set(x, y, BACK_WALL)
     return coords

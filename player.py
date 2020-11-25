@@ -85,12 +85,6 @@ class Player:
         if self.puff_frame_timer % 2 == 0:
             puff['frame'] += 1
 
-        if puff['frame'] >= len(puff['frame_list']):
-            puff['frame'] = 0
-            self.draw = self.draw_none
-            pyxel.play(0, 5)
-            self.current_checkpoint.restore()
-
     def draw_none(self, cam: Camera):
         pass
 
@@ -101,6 +95,13 @@ class Player:
         self.move()
 
     def update_dead(self):
+        puff = self.death_puff
+        if puff['frame'] >= len(puff['frame_list']):
+            puff['frame'] = 0
+            self.draw = self.draw_none
+            pyxel.play(0, 5)
+            self.current_checkpoint.restore()
+            self.x, self.y = self.current_checkpoint.x - 1, self.current_checkpoint.y
         pass
 
     def apply_gravity(self):
@@ -182,13 +183,12 @@ class Player:
             self.dx = self.dir * PLR_SPD
             pyxel.play(0, 0)
 
-    def kill(self):
+    def kill(self, no_anim: bool = False):
         self.draw = self.draw_dead
         self.update = self.update_dead
         self.death_puff["x"] = self.x
         self.death_puff["y"] = self.y
-        self.puff_frame_timer = 0
-        self.x, self.y = self.current_checkpoint.x - 1, self.current_checkpoint.y
+        self.puff_frame_timer = 7 if no_anim else 0
         self.dir = 1
         self.dx = 0
         self.dy = 0

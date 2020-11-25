@@ -67,6 +67,8 @@ class Checkpoint:
 
     def deactivate(self):
         print("DEACTIVATE FROM CHECKPOINT")
+        print(self.x)
+        print(self.y)
         self.switch_state("inactive")
 
     def restore(self):
