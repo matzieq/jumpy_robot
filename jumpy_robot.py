@@ -1,3 +1,4 @@
+from mobileplatform import MobilePlatform
 from gate import Gate
 from bad_robot import BadRobot
 import json
@@ -10,7 +11,10 @@ import pyxel
 from operator import itemgetter
 
 from player import Player
-from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, GATE_IDS, GATE_START_ADDRESS, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH, TILE_SIZE
+from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, GATE_IDS, GATE_START_ADDRESS, MAP_HEIGHT, MAP_WIDTH, MOVING_PLATFORM, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH, TILE_SIZE
+
+# if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+#     os.chdir(sys._MEIPASS)
 
 DEBUG_MODE = True
 
@@ -26,6 +30,7 @@ class Game:
             "check": [],
             "switch": [],
             "robot": [],
+            "platform": [],
             "gate": [],
             "plr": [self.plr],
             "hud": [Hud(self)]
@@ -82,7 +87,7 @@ class Game:
                     if obj.is_switch:
                         self.handle_switch_collisions(obj)
                     if obj.is_solid:
-                        self.handle_solid_collisions()
+                        self.handle_solid_collisions(obj)
 
     def handle_checkpoint_collisions(self, checkpoint):
         if not checkpoint.is_active:
@@ -104,9 +109,8 @@ class Game:
     def handle_harmful_collisions(self):
         self.plr.kill()
 
-    def handle_solid_collisions(self):
-        self.plr.x -= self.plr.dx
-        self.plr.dx = 0
+    def handle_solid_collisions(self, obj):
+        self.plr.handle_solid_object_collision(obj)
 
     def recalculate_score(self):
         score = 0
@@ -132,6 +136,10 @@ class Game:
         for x, y in place_objects(BADDER_ROBOT):
             self.game_objects["robot"].append(
                 BadRobot(x * 8, y * 8, self.cam, True))
+
+        for x, y in place_objects(MOVING_PLATFORM):
+            self.game_objects["platform"].append(
+                MobilePlatform(x * 8, y * 8))
 
         for id in range(1, GATE_IDS + 1):
             print(id)

@@ -5,7 +5,7 @@ from camera import Camera
 import math
 import pyxel
 import utils
-from utils import collide_map
+from utils import collide_map, collide_object
 from constants import GRAV, JUMP_FORCE, MAX_FALLING_SPEED, PLR_SPD
 
 IDLE = 1
@@ -29,6 +29,7 @@ class Player:
     double_jump = False
     jump_pressed = False
     can_wall_jump = False
+    last_platform = None
     alive = True
     current_checkpoint = None
     puff_frame_timer = 0
@@ -96,6 +97,9 @@ class Player:
 
     def update_normal(self):
         self.apply_gravity()
+        if self.last_platform != None and hasattr(self.last_platform, 'spd'):
+            if self.y < self.last_platform.y:
+                self.y = self.last_platform.y - 8
         self.check_input()
         self.handle_collisions()
         self.move()
@@ -114,8 +118,12 @@ class Player:
         if self.dy < MAX_FALLING_SPEED:
             self.dy += GRAV
 
+        if self.on_ground and self.dy > 0:
+            pass
+
     def check_input(self):
         if pyxel.btnp(pyxel.KEY_SPACE):
+            self.last_platform = None
             self.jump()
             self.jump_pressed = True
 
@@ -164,6 +172,61 @@ class Player:
             self.kill()
         else:
             self.can_wall_jump = is_wall_left or is_wall_right
+
+    def handle_solid_object_collision(self, other):
+        old_x = self.x
+        old_y = self.y
+        is_other_over = other.y < self.y
+        is_other_under = other.y > self.y
+        is_other_left = other.x + 8 < self.x + 8
+        is_other_right = other.x > self.x
+
+        correction_dist = 3
+
+        self.on_ground = False
+
+        # handle vertical collisions
+        self.x -= self.dx
+
+        if collide_object(self, other):
+            if is_other_over:
+
+                print("OVER")
+                while collide_object(self, other):
+                    self.y += correction_dist
+                self.y += correction_dist
+            if is_other_under:
+                print("UNDER")
+                self.on_ground = True
+
+                while collide_object(self, other):
+                    self.y -= correction_dist
+
+                self.y -= correction_dist
+                self.double_jump = False
+                self.dx = 0
+                self.last_platform = other
+                if hasattr(other, 'spd') and self.y < other.y:
+                    self.y = other.y - 8
+            self.dy = 0
+
+        # handle horizontal collisions
+        self.x = old_x
+        self.y -= self.dy
+
+        if collide_object(self, other):
+            if is_other_right:
+                print("RIGHT")
+                while collide_object(self, other):
+                    self.x -= correction_dist
+                # self.x -= correction_dist
+            elif is_other_left:
+                print("LEFT")
+                while collide_object(self, other):
+                    self.x += correction_dist
+                # self.x += correction_dist
+
+            self.dx = 0
 
     def move(self):
         self.x += self.dx

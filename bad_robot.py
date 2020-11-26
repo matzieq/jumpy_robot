@@ -1,3 +1,4 @@
+from constants import MAX_FALLING_SPEED
 import math
 import pyxel
 from typing import TYPE_CHECKING
@@ -11,7 +12,7 @@ ROW = 72
 NORMAL = 0
 BAD = 1
 MOVE_SPEED = 3
-BACK_SPEED = 0.5
+BACK_SPEED = 1
 
 
 class BadRobot:
@@ -27,8 +28,9 @@ class BadRobot:
         self.y = y
         self.update = self.idle
         self.cam_ref = cam_ref
-        self.max_timer = 30 if is_badder else 60
+        self.max_timer = 20 if is_badder else 40
         self.timer = self.max_timer
+        self.spd = MOVE_SPEED + 2 if is_badder else MOVE_SPEED
 
     def draw(self, cam: 'Camera'):
         pyxel.blt(self.x - cam.x, self.y - cam.y,
