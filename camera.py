@@ -1,5 +1,8 @@
+from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 import math
 from random import randint
+
+import pyxel
 
 
 class Camera:
@@ -9,6 +12,12 @@ class Camera:
     shake_y = 0
     shake_magnitude = 0
     shake_duration = 0
+    flash_color = -1
+
+    def draw(self):
+        if self.flash_color > -1 and self.flash_color <= 15:
+            pyxel.rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.flash_color)
+            self.flash_color = -1
 
     def update(self, target_x, target_y):
         self.x = math.floor(target_x / 256) * 256 + self.shake_x
@@ -28,3 +37,6 @@ class Camera:
     def shake(self, duration: int, magnitude: int):
         self.shake_duration = duration
         self.shake_magnitude = magnitude
+
+    def flash(self, color: int):
+        self.flash_color = color

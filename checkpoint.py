@@ -10,11 +10,17 @@ FPS = 20
 
 
 class Checkpoint:
+    state = "inactive"
+    is_active = False
+
+    is_check = True
+    is_bad = False
+    is_solid = False
+    is_switch = False
+
     def __init__(self, x: int, y: int, plr_ref: 'Player') -> None:
         self.x = x
         self.y = y
-        self.state = "inactive"
-        self.is_active = False
 
         self.anims = {
             "inactive": [11],
@@ -61,15 +67,12 @@ class Checkpoint:
         }
 
     def activate(self):
-        print("ACTIVATE FROM CHECKPOINT")
         self.switch_state("active")
         self.is_active = True
 
     def deactivate(self):
-        print("DEACTIVATE FROM CHECKPOINT")
-        print(self.x)
-        print(self.y)
         self.switch_state("inactive")
+        self.is_active = False
 
     def restore(self):
         self.switch_state("restoring")

@@ -17,6 +17,11 @@ BACK_SPEED = 0.5
 class BadRobot:
     anim_frame = NORMAL
 
+    is_check = False
+    is_bad = True
+    is_solid = False
+    is_switch = False
+
     def __init__(self, x: int, y: int, cam_ref: 'Camera', is_badder: bool = False) -> None:
         self.x = x
         self.y = y
@@ -45,15 +50,17 @@ class BadRobot:
     def attacking(self):
         self.y += MOVE_SPEED
         collide, _ = collide_map(self.x, self.y, 8, 8)
-        print(self.y)
+
         if collide:
             self.anim_frame = NORMAL
+
             while collide_map(self.x, self.y, 8, 8)[0]:
-                print(collide_map(self.x, self.y, 8, 8)[0])
                 self.y -= 1
+
             self.update = self.retracting
             if is_on_screen(self.x, self.y, self.cam_ref):
                 self.cam_ref.shake(3, 1)
+                pyxel.play(0, 9)
 
     def retracting(self):
         self.y -= BACK_SPEED

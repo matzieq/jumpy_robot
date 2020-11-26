@@ -48,6 +48,11 @@ class Player:
         "frame_list": [0, 1, 2, 3, 4]
     }
 
+    is_check = False
+    is_bad = False
+    is_solid = False
+    is_switch = False
+
     def __init__(self) -> None:
         self.update = self.update_normal
         self.draw = self.draw_normal
@@ -166,7 +171,6 @@ class Player:
 
     def jump(self):
         if self.on_ground:
-            print(self.y)
             self.dy = -JUMP_FORCE
             self.dx = self.dir * PLR_SPD
             pyxel.play(0, 0)
