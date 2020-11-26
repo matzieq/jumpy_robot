@@ -1,15 +1,16 @@
 from gate import Gate
 from bad_robot import BadRobot
-import functools
+import json
 from hud import Hud
 from switch import Switch
-from utils import collide_object, place_objects
+from utils import collide_object, overlap_map_area, place_objects
 from checkpoint import Checkpoint
 from camera import Camera
 import pyxel
+from operator import itemgetter
 
 from player import Player
-from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, GATE_IDS, GATE_START_ADDRESS, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH
+from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, GATE_IDS, GATE_START_ADDRESS, MAP_HEIGHT, MAP_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH, TILE_SIZE
 
 DEBUG_MODE = True
 
@@ -29,6 +30,7 @@ class Game:
             "plr": [self.plr],
             "hud": [Hud(self)]
         }
+        self.game_data = {}
 
         pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Jump stick robo")
         pyxel.load('assets/jumpy_robot.pyxres')
@@ -41,6 +43,10 @@ class Game:
         self.plr.kill(True)
         self.plr.current_checkpoint.restore()
 
+        with open('assets/data.json', 'r') as j:
+            self.game_data = json.load(j)
+
+        self.update_gate_status()
         pyxel.run(self.update, self.draw)
 
     def draw(self):
@@ -57,6 +63,7 @@ class Game:
         self.cam.update(self.plr.x, self.plr.y)
         self.update_objects()
         self.handle_collisions()
+        self.check_trigger_areas()
         self.check_quit()
 
     def update_objects(self):
@@ -71,9 +78,9 @@ class Game:
                     if obj.is_check:
                         self.handle_checkpoint_collisions(obj)
                     if obj.is_bad:
-                        self.handle_harmful_collisions(obj)
+                        self.handle_harmful_collisions()
                     if obj.is_switch:
-                        self.handle_switch_collisions()
+                        self.handle_switch_collisions(obj)
                     if obj.is_solid:
                         self.handle_solid_collisions()
 
@@ -126,10 +133,36 @@ class Game:
             self.game_objects["robot"].append(
                 BadRobot(x * 8, y * 8, self.cam, True))
 
-        for id in range(GATE_IDS):
+        for id in range(1, GATE_IDS + 1):
             print(id)
-            for x, y in place_objects(GATE_START_ADDRESS + id + 1):
+            for x, y in place_objects(GATE_START_ADDRESS + id):
                 self.game_objects["gate"].append(Gate(x * 8, y * 8, id))
+
+    def update_gate_status(self):
+        for gate_status in self.game_data["gate_starting_state"]:
+            for gate in self.game_objects["gate"]:
+                if gate.id == gate_status["id"] and gate_status["open"]:
+                    gate.open()
+
+    def check_trigger_areas(self):
+        for area in self.game_data["gate_trigger_areas"]:
+            for gate in self.game_objects["gate"]:
+                if gate.id == area["id"]:
+                    rect = area["rect"]
+                    x, y, w, h = itemgetter('x', 'y', 'w', 'h')(rect)
+
+                    if overlap_map_area(self.plr, x, y, w, h) and gate.is_open != area["target_open_state"]:
+                        if area["target_open_state"]:
+                            gate.open()
+                        else:
+                            gate.close()
+                        check_x, check_y = itemgetter("x", "y")(
+                            area["checkpoint_activate"])
+                        checkpoint_to_toggle = next(
+                            (check for check in self.game_objects["check"] if check.x == check_x * TILE_SIZE and check.y == check_y * TILE_SIZE), None)
+                        if checkpoint_to_toggle != None:
+                            self.handle_checkpoint_collisions(
+                                checkpoint_to_toggle)
 
     def check_quit(self):
         if pyxel.btnp(pyxel.KEY_Q):

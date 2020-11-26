@@ -35,6 +35,8 @@ class Gate:
 
     def close(self):
         self.is_open = False
+        self.is_solid = True
 
     def open(self):
         self.is_open = True
+        self.is_solid = False
