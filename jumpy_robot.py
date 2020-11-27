@@ -11,9 +11,10 @@ import pyxel
 from operator import itemgetter
 import os
 import sys
+from laser import Laser
 
 from player import Player
-from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, GATE_IDS, GATE_START_ADDRESS, MAP_HEIGHT, MAP_WIDTH, MOVING_PLATFORM, MOVING_PLATFORM_OPPOSITE, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH, TILE_SIZE
+from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, FAST_LASER, GATE_IDS, GATE_START_ADDRESS, LASER, MAP_HEIGHT, MAP_WIDTH, MOVING_PLATFORM, MOVING_PLATFORM_OPPOSITE, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH, TILE_SIZE, VERY_FAST_LASER
 
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
     os.chdir(sys._MEIPASS)
@@ -33,6 +34,8 @@ class Game:
             "switch": [],
             "robot": [],
             "platform": [],
+            "laser": [],
+            "shot": [],
             "gate": [],
             "plr": [self.plr],
             "hud": [Hud(self)]
@@ -147,6 +150,18 @@ class Game:
         for x, y in place_objects(MOVING_PLATFORM_OPPOSITE):
             self.game_objects["platform"].append(
                 MobilePlatform(x * 8, y * 8, True))
+
+        for x, y in place_objects(LASER):
+            self.game_objects["laser"].append(
+                Laser(x * 8, y * 8, self, self.cam, 3))
+
+        for x, y in place_objects(FAST_LASER):
+            self.game_objects["laser"].append(
+                Laser(x * 8, y * 8, self, self.cam, 2))
+
+        for x, y in place_objects(VERY_FAST_LASER):
+            self.game_objects["laser"].append(
+                Laser(x * 8, y * 8, self, self.cam, 1))
 
         for id in range(1, GATE_IDS + 1):
             for x, y in place_objects(GATE_START_ADDRESS + id):

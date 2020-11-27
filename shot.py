@@ -21,23 +21,35 @@ class Shot:
     is_solid = False
     is_switch = False
 
-    alive = True
+    is_alive = True
     is_narrow = True
 
     def __init__(self, x: int, y: int) -> None:
         self.x = x
         self.y = y
+        self.initial_x = x
+        self.initial_y = y
 
     def draw(self, cam: 'Camera'):
-        if self.alive:
+        if self.is_alive:
             pyxel.blt(self.x - cam.x, self.y - cam.y,
-                      0, self.anim_frame * 8, ROW, 8, 8, 0)
+                      0, 0, ROW, 8, 8, 0)
 
     def update(self):
-        if self.alive:
+        if self.is_alive:
             self.y += 3
-            if collide_map(self.x, self.y, 8, 8):
+            collide, _ = collide_map(self.x, self.y, 8, 8)
+            if collide:
                 self.kill()
 
     def kill(self):
-        self.alive = False
+        self.reset()
+        self.is_alive = False
+
+    def reset(self):
+        self.x = self.initial_x
+        self.y = self.initial_y
+
+    def fire(self):
+        self.reset()
+        self.is_alive = True
