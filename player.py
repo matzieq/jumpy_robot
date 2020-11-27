@@ -254,7 +254,6 @@ class Player:
         self.alive = False
         self.draw = self.draw_dead
         self.update = self.update_dead
-        self.dir = 1
         self.dx = 0
         self.dy = 0
 

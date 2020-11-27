@@ -9,12 +9,14 @@ from checkpoint import Checkpoint
 from camera import Camera
 import pyxel
 from operator import itemgetter
+import os
+import sys
 
 from player import Player
 from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, GATE_IDS, GATE_START_ADDRESS, MAP_HEIGHT, MAP_WIDTH, MOVING_PLATFORM, MOVING_PLATFORM_OPPOSITE, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH, TILE_SIZE
 
-# if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-#     os.chdir(sys._MEIPASS)
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    os.chdir(sys._MEIPASS)
 
 DEBUG_MODE = True
 
@@ -38,7 +40,8 @@ class Game:
         self.game_data = {}
 
         pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Jump stick robo")
-        pyxel.load('assets/jumpy_robot.pyxres')
+        pyxel.load(os.path.join(os.path.dirname(__file__),
+                                'assets', 'jumpy_robot.pyxres'),)
 
         self.load_objects()
 
@@ -48,7 +51,7 @@ class Game:
         self.plr.kill(True)
         self.plr.current_checkpoint.restore()
 
-        with open('assets/data.json', 'r') as j:
+        with open(os.path.join(os.path.dirname(__file__), 'assets', 'data.json'), 'r') as j:
             self.game_data = json.load(j)
 
         self.update_gate_status()
