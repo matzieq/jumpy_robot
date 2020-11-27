@@ -15,15 +15,15 @@ class MobilePlatform:
     is_bad = False
     is_solid = True
     is_switch = False
-    spd = 0.8
 
-    def __init__(self, x: int, y: int) -> None:
+    spd = 1
+
+    def __init__(self, x: int, y: int, start_moving_up: bool = False) -> None:
         self.x = x
         self.y = y
-        self.top_level = y
-        self.bottom_level = y + (4 * TILE_SIZE)
-        self.dir = 1
-        self.cur_spd = 0
+        self.top_level = y if not start_moving_up else y - (5 * TILE_SIZE)
+        self.bottom_level = y if start_moving_up else y + (5 * TILE_SIZE)
+        self.dir = -1 if start_moving_up else 1
 
     def draw(self, cam: 'Camera'):
         pyxel.blt(self.x - cam.x, self.y - cam.y + 1,

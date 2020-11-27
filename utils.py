@@ -48,10 +48,6 @@ def collide_object(self, other) -> bool:
 def overlap_map_area(obj, _x: int, _y: int, _w: int, _h: int) -> bool:
     x, y, w, h = _x * TILE_SIZE, _y * TILE_SIZE, _w * TILE_SIZE, _h * TILE_SIZE
     is_overlap = obj.x < x + w and obj.x + 8 > x and obj.y < y + h and obj.y + 8 > y
-    if pyxel.btnp(pyxel.KEY_S):
-        print(obj.x, x)
-        print(obj.y, y)
-        print(is_overlap)
 
     return is_overlap
 

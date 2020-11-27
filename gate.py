@@ -19,8 +19,6 @@ class Gate:
     is_switch = False
 
     def __init__(self, x: int, y: int, id: int) -> None:
-        print(x, y)
-        print("***")
         self.x = x
         self.y = y
         self.id = id

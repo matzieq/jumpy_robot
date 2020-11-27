@@ -190,13 +190,11 @@ class Player:
 
         if collide_object(self, other):
             if is_other_over:
-
-                print("OVER")
                 while collide_object(self, other):
                     self.y += correction_dist
                 self.y += correction_dist
+
             if is_other_under:
-                print("UNDER")
                 self.on_ground = True
 
                 while collide_object(self, other):
@@ -216,12 +214,10 @@ class Player:
 
         if collide_object(self, other):
             if is_other_right:
-                print("RIGHT")
                 while collide_object(self, other):
                     self.x -= correction_dist
                 # self.x -= correction_dist
             elif is_other_left:
-                print("LEFT")
                 while collide_object(self, other):
                     self.x += correction_dist
                 # self.x += correction_dist

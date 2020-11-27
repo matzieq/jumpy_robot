@@ -11,7 +11,7 @@ import pyxel
 from operator import itemgetter
 
 from player import Player
-from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, GATE_IDS, GATE_START_ADDRESS, MAP_HEIGHT, MAP_WIDTH, MOVING_PLATFORM, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH, TILE_SIZE
+from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, GATE_IDS, GATE_START_ADDRESS, MAP_HEIGHT, MAP_WIDTH, MOVING_PLATFORM, MOVING_PLATFORM_OPPOSITE, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH, TILE_SIZE
 
 # if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
 #     os.chdir(sys._MEIPASS)
@@ -141,8 +141,11 @@ class Game:
             self.game_objects["platform"].append(
                 MobilePlatform(x * 8, y * 8))
 
+        for x, y in place_objects(MOVING_PLATFORM_OPPOSITE):
+            self.game_objects["platform"].append(
+                MobilePlatform(x * 8, y * 8, True))
+
         for id in range(1, GATE_IDS + 1):
-            print(id)
             for x, y in place_objects(GATE_START_ADDRESS + id):
                 self.game_objects["gate"].append(Gate(x * 8, y * 8, id))
 
