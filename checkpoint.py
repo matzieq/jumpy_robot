@@ -18,6 +18,8 @@ class Checkpoint:
     is_solid = False
     is_switch = False
 
+    dir = 1
+
     def __init__(self, x: int, y: int, plr_ref: 'Player') -> None:
         self.x = x
         self.y = y
@@ -52,11 +54,12 @@ class Checkpoint:
 
         if self.is_active and self.current_anim["frame"] == 9:
             self.plr_ref.restore()
+            self.dir = 1
 
     def draw(self, cam):
         current_frame = self.anims[self.state][self.current_anim["frame"]] * 8
         pyxel.blt(self.x - cam.x, self.y - cam.y,
-                  0, current_frame, ROW, 8, 8, 0)
+                  0, current_frame, ROW, self.dir * 8, 8, 0)
 
     def switch_anim(self, new_anim: str):
         self.state = new_anim
@@ -76,6 +79,7 @@ class Checkpoint:
 
     def restore(self):
         self.switch_state("restoring")
+        self.dir = self.plr_ref.dir
 
     def switch_state(self, new_state):
         self.current_anim = {
