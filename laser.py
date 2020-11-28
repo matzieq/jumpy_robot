@@ -48,7 +48,7 @@ class Laser:
             self.shot.fire()
 
             if is_on_screen(self.x, self.y, self.cam_ref):
-                pyxel.play(0, 9)
+                pyxel.play(0, 21)
 
     def shooting(self):
         self.shot.update()

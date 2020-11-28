@@ -260,11 +260,17 @@ class Player:
         self.dx = 0
         self.dy = 0
 
+        self.death_puff["x"] = self.x
+        self.death_puff["y"] = self.y
+        self.puff_frame_timer = 0
+
         if not no_anim:
-            self.death_puff["x"] = self.x
-            self.death_puff["y"] = self.y
-            self.puff_frame_timer = 0
             pyxel.play(0, 4)
+
+        if no_anim:
+            self.current_checkpoint.restore()
+            self.x, self.y = self.current_checkpoint.x - 1, self.current_checkpoint.y
+            self.alive = True
 
     def restore(self):
         self.draw = self.draw_normal

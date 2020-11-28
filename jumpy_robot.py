@@ -12,6 +12,7 @@ from operator import itemgetter
 import os
 import sys
 from laser import Laser
+from data import game_data
 
 from player import Player
 from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, FAST_LASER, GATE_IDS, GATE_START_ADDRESS, LASER, MAP_HEIGHT, MAP_WIDTH, MOVING_PLATFORM, MOVING_PLATFORM_OPPOSITE, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH, TILE_SIZE, VERY_FAST_LASER
@@ -43,6 +44,7 @@ class Game:
     key_timer = 0
     menu_option = 0
     is_instructions = False
+    end_credits_pos = 0
 
     def __init__(self) -> None:
         self.game_objects = {
@@ -58,7 +60,7 @@ class Game:
         }
         self.game_data = {}
 
-        pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Jump stick robo")
+        pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, caption="Jumpstick robo")
         pyxel.load(os.path.join(os.path.dirname(__file__),
                                 'assets', 'jumpy_robot.pyxres'),)
 
@@ -70,13 +72,12 @@ class Game:
         self.plr.kill(True)
         self.plr.current_checkpoint.restore()
 
-        with open(os.path.join(os.path.dirname(__file__), 'assets', 'data.json'), 'r') as j:
-            self.game_data = json.load(j)
+        self.game_data = json.loads(game_data)
 
         self.update_gate_status()
-        self.draw_state = self.draw_title
+        self.draw_state = self.draw_end
 
-        self.update_state = self.update_title
+        self.update_state = self.update_end
 
         pyxel.run(self.update, self.draw)
 
@@ -103,6 +104,12 @@ class Game:
         self.handle_collisions()
         self.check_trigger_areas()
         self.check_quit()
+        self.check_win()
+
+    def check_win(self):
+        if self.score >= len(self.game_objects['switch']):
+            self.update_state = self.update_end
+            self.draw_state = self.draw_end
 
     def update_objects(self):
         for obj_list in self.game_objects.values():
@@ -222,7 +229,10 @@ class Game:
 
     def check_quit(self):
         if pyxel.btnp(pyxel.KEY_Q):
-            pyxel.quit()
+            pyxel.stop()
+            self.key_used = None
+            self.update_state = self.update_title
+            self.draw_state = self.draw_title
 
         if DEBUG_MODE:
             if pyxel.btnp(pyxel.KEY_LEFT):
@@ -237,6 +247,7 @@ class Game:
     def draw_title(self):
         pyxel.cls(0)
         pyxel.bltm(0, 0, 0, 0, 128, 32, 19)
+
         pyxel.blt(100, 20,
                   0, 0, 104, 48, 24)
         if self.is_instructions:
@@ -321,6 +332,62 @@ class Game:
     def draw_sprite_tuple(self, coord_x: int, coord_y: int, sprite_tuple: tuple[int], flipped: bool = False):
         x, y, w, h = sprite_tuple
         pyxel.blt(coord_x, coord_y, 0, x, y, w if not flipped else -w, h, 0)
+
+    def draw_end(self):
+        pyxel.cls(0)
+        self.draw_shadow_text(
+            95, 120 + self.end_credits_pos, "CONGRATULATIONS!", 6, 5)
+
+        self.draw_shadow_text(
+            30, 180 + self.end_credits_pos, "You turned off all the ligts or whatever they were!", 6, 5)
+
+        self.draw_shadow_text(
+            15, 200 + self.end_credits_pos, "You are the jumpiest jumper ever to jump the jumpy jumps!", 6, 5)
+
+        self.draw_shadow_text(
+            15, 260 + self.end_credits_pos, "This game was created for the 2020 one button game jam.", 6, 5)
+
+        self.draw_shadow_text(
+            15, 300 + self.end_credits_pos, "All pixels, bleeps and bloops, as well as spaghetti code:", 6, 5)
+
+        self.draw_shadow_text(
+            90, 310 + self.end_credits_pos, "PRESIDENT OF SPACE", 6, 5)
+
+        self.draw_shadow_text(
+            25, 350 + self.end_credits_pos, "Special thanks, as always, to the FIRST LADY OF SPACE", 6, 5)
+
+        self.draw_shadow_text(
+            15, 400 + self.end_credits_pos, "This game was made using the Pyxel Engine by TAKASHI KITAO", 6, 5)
+
+        self.draw_shadow_text(
+            15, 420 + self.end_credits_pos, "It's still pretty rough around the edges, but quite cool.", 6, 5)
+
+        self.draw_shadow_text(
+            15, 440 + self.end_credits_pos, "Check it out, especially if you like python.", 6, 5)
+
+        self.draw_shadow_text(
+            80, 490 + self.end_credits_pos, "THANK YOU FOR PLAYING!", 6, 5)
+
+        pyxel.rect(0, 0, SCREEN_WIDTH, 60, 0)
+        pyxel.rect(0, SCREEN_HEIGHT - 20, SCREEN_WIDTH, 20, 0)
+
+        pyxel.bltm(0, 0, 0, 0, 128, 32, 19, 0)
+        pyxel.blt(100, 20,
+                  0, 0, 104, 48, 24, 0)
+        pass
+
+    def update_end(self):
+        if self.end_credits_pos >= -420:
+            self.end_credits_pos -= 0.4
+        key = button_pressed()
+
+        if key != None:
+            self.update_state = self.update_title
+            self.draw_state = self.draw_title
+
+    def draw_shadow_text(self, x: int, y: int, text: str, col1: int, col2: int):
+        pyxel.text(x, y + 1, text, col2)
+        pyxel.text(x, y, text, col1)
 
 
 Game()
