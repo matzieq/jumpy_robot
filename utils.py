@@ -10,6 +10,9 @@ if TYPE_CHECKING:
 solid_tiles = [32, 96]
 harmful_tiles = [96, 97, 98, 99]
 
+controls = [pyxel.KEY_SPACE, pyxel.KEY_ENTER, pyxel.KEY_KP_ENTER,
+            pyxel.MOUSE_LEFT_BUTTON, pyxel.MOUSE_RIGHT_BUTTON, pyxel.MOUSE_MIDDLE_BUTTON]
+
 
 def collide_map(x: float, y: float, w: int, h: int) -> tuple[bool, bool]:
     collide = False
@@ -64,3 +67,23 @@ def place_objects(obj_type: int) -> list[tuple[int, int]]:
 
 def is_on_screen(x: int, y: int, cam: 'Camera') -> bool:
     return x >= cam.x and x <= cam.x + SCREEN_WIDTH and y >= cam.y and y <= cam.y + SCREEN_HEIGHT
+
+
+def button_pressed():
+    for key in controls:
+        if pyxel.btnp(key):
+            return key
+
+    return None
+
+
+def button_released(key):
+    return pyxel.btnr(key)
+
+
+def button_held():
+    for key in controls:
+        if pyxel.btn(key):
+            return True
+
+    return False

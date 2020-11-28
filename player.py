@@ -5,7 +5,7 @@ from camera import Camera
 import math
 import pyxel
 import utils
-from utils import collide_map, collide_object
+from utils import button_pressed, button_released, collide_map, collide_object
 from constants import GRAV, JUMP_FORCE, MAX_FALLING_SPEED, PLR_SPD
 
 IDLE = 1
@@ -28,6 +28,7 @@ class Player:
     on_ground = False
     double_jump = False
     jump_pressed = False
+    key_used = None
     can_wall_jump = False
     last_platform = None
     alive = True
@@ -122,12 +123,14 @@ class Player:
             pass
 
     def check_input(self):
-        if pyxel.btnp(pyxel.KEY_SPACE):
+        key = button_pressed()
+        if key != None:
+            self.key_used = key
             self.last_platform = None
             self.jump()
             self.jump_pressed = True
 
-        if pyxel.btnr(pyxel.KEY_SPACE):
+        if self.key_used != None and button_released(self.key_used):
             self.jump_pressed = False
 
         if not self.jump_pressed and self.dy < 0:
