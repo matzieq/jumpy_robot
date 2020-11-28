@@ -75,9 +75,9 @@ class Game:
         self.game_data = json.loads(game_data)
 
         self.update_gate_status()
-        self.draw_state = self.draw_end
+        self.draw_state = self.draw_title
 
-        self.update_state = self.update_end
+        self.update_state = self.update_title
 
         pyxel.run(self.update, self.draw)
 
