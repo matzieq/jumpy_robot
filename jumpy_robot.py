@@ -17,8 +17,11 @@ from data import game_data
 from player import Player
 from constants import BADDER_ROBOT, BAD_ROBOT, CHECK, FAST_LASER, GATE_IDS, GATE_START_ADDRESS, LASER, MAP_HEIGHT, MAP_WIDTH, MOVING_PLATFORM, MOVING_PLATFORM_OPPOSITE, SCREEN_HEIGHT, SCREEN_WIDTH, SWITCH, TILE_SIZE, VERY_FAST_LASER
 
-if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-    os.chdir(sys._MEIPASS)
+# if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+#     os.chdir(sys._MEIPASS)
+
+if getattr(sys, 'frozen', False):
+    os.chdir(os.path.dirname(sys.executable))
 
 DEBUG_MODE = True
 
